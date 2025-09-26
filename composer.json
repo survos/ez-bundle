@@ -1,6 +1,6 @@
 {
     "name": "survos/ez-bundle",
-    "description": "Symfony SurvosEzBundle",
+    "description": "configure EasyAdmin with attributes",
     "keywords": [
         "symfony-ux",
         "symfony"
