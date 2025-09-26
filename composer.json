@@ -18,19 +18,16 @@
         "symfony/config": "^7.3",
         "symfony/dependency-injection": "^7.3",
         "symfony/http-kernel": "^7.3",
-        "symfony/console": "^7.3"
+        "symfony/console": "^7.3",
+        "easycorp/easyadmin-bundle": "^4.25"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^7.3"
+        "symfony/phpunit-bridge": "^7.3",
+        "nette/php-generator": "^4.2"
     },
     "autoload": {
         "psr-4": {
-            "Survos\\SurvosEzBundle\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Survos\\SurvosEzBundle\\Tests\\": "tests/"
+            "Survos\\EzBundle\\": "src/"
         }
     }
 }

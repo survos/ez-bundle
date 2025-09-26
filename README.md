@@ -19,13 +19,27 @@ If you're using Symfony Flex, the bundle will be automatically registered. Other
 ```php
 return [
     // ...
-    Survos\SurvosEzBundle\SurvosEzBundle::class => ['all' => true],
+    Survos\EzBundle\SurvosEzBundle::class => ['all' => true],
 ];
 ```
 
 ## Usage
 
-This bundle provides various components depending on your configuration. Check the generated service classes and controllers for specific usage examples.
+```php
+use Survos\EzBundle\Attribute\EzAdmin;
+use Survos\EzBundle\Attribute\EzField;
+use Survos\EzBundle\Attribute\Page;
+
+#[EzAdmin(icon: 'fa-regular fa-image', defaultSort: ['year' => 'DESC'], indexMax: 12)]
+class ForteObj
+{
+    #[EzField(index: true, order: 1, filter: true)]
+    public ?int $year = null;
+
+    #[EzField(index: true, order: 2)]
+    public ?string $title = null;
+}
+````
 
 ## Testing
 

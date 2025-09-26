@@ -1,9 +1,9 @@
 <?php
 
-namespace Survos\SurvosEzBundle\Tests;
+namespace Survos\EzBundle\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Survos\SurvosEzBundle\SurvosEzBundle;
+use Survos\EzBundle\SurvosEzBundle;
 
 class SurvosEzBundleTest extends \TestCase
 {

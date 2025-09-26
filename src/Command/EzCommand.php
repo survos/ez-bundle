@@ -1,6 +1,6 @@
 <?php
 
-namespace Survos\SurvosEzBundle\Command;
+namespace Survos\EzBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
