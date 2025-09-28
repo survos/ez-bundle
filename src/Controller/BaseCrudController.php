@@ -28,6 +28,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Survos\EzBundle\Attribute\Page;
 use Survos\EzBundle\Service\EzService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Extend this in your app CRUDs.
@@ -38,6 +39,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 abstract class BaseCrudController extends AbstractCrudController
 {
     public function __construct(
+        protected UrlGeneratorInterface $urlGenerator,
         #[Autowire(service: EzService::class)]
         private readonly EzService $ez,
     ) {}

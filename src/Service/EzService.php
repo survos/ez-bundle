@@ -19,7 +19,9 @@ namespace Survos\EzBundle\Service;
 final class EzService
 {
     /** @var array<string, array<string,mixed>> */
-    public function __construct(private readonly array $map = [])
+    public function __construct(
+        private array $config = [], // from the bundle config
+        private readonly array $map = [])
     {
     }
 
