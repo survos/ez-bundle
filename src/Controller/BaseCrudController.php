@@ -42,9 +42,9 @@ abstract class BaseCrudController extends AbstractCrudController
     private array $seen = [];
     public function __construct(
         protected UrlGeneratorInterface $urlGenerator,
-        #[Autowire(service: EzService::class)]
-        private readonly EzService $ez,
-    ) {}
+        #[Autowire(service: EzService::class)] private readonly EzService $ez,
+    ) {
+    }
 
     public function configureActions(Actions $actions): Actions
     {
