@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -38,6 +39,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class BaseCrudController extends AbstractCrudController
 {
+    private array $seen = [];
     public function __construct(
         protected UrlGeneratorInterface $urlGenerator,
         #[Autowire(service: EzService::class)]
@@ -278,4 +280,16 @@ abstract class BaseCrudController extends AbstractCrudController
         $meta = $entity->getPropertyMetadata($property);
         return (bool) $meta?->get('isAssociation');
     }
+
+    public function push(FieldInterface $field): ?FieldInterface
+    {
+        $dto = $field->getAsDto();
+        $property = $dto->getProperty();
+        if (in_array($property, $this->seen)) {
+            return null;
+        }
+        $this->seen[] = $property;
+        return $field;
+    }
+
 }
