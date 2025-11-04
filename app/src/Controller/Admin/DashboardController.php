@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AdminDashboard(routePath: '/', routeName: 'admin')]
@@ -25,10 +26,11 @@ class DashboardController extends AbstractDashboardController
     }
 
     #[AdminRoute(name: 'product_show', path: '/show/{sku}')]
-    public function show(AdminContext $adminContext,  $sku): Response
+    public function show(
+        #[MapEntity(mapping: ['sku' => 'sku'])] Product $product): Response
     {
-        dd($adminContext);
-        dd($sku);
+        return $this->render('product.html.twig', ['product' => $product]);
+//        dd($sku);
 
     }
 

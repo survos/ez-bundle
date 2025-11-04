@@ -2,7 +2,7 @@
 
 use Castor\Attribute\AsTask;
 
-use function Castor\{io, run, fs, variable, finder};
+use function Castor\{io, run, fs, variable, finder, http_request};
 
 function getBundleName(): string
 {
@@ -164,4 +164,85 @@ function clean(): void
             io()->success("Removed {$file}");
         }
     }
+}
+
+#[AsTask('ngrok', description: 'Start ngrok tunnel to local Symfony server')]
+function ngrok(
+    string $subdomain = '',
+    string $region = '',
+    bool $inspect = true
+): void
+{
+    io()->title('Starting ngrok tunnel');
+
+    $port = get_symfony_port_from_proxy();
+
+    if (!$port) {
+        io()->error('Could not detect Symfony server port');
+        return;
+    }
+
+    io()->success("Found Symfony server on port {$port}");
+
+    $command = "ngrok http localhost:{$port}";
+
+    if ($subdomain) {
+        $command .= " --subdomain={$subdomain}";
+    }
+
+    if ($region) {
+        $command .= " --region={$region}";
+    }
+
+    if (!$inspect) {
+        $command .= " --inspect=false";
+    }
+
+    io()->note('Starting ngrok tunnel...');
+    io()->note($command);
+    io()->note('Press Ctrl+C to stop');
+
+    run($command);
+}
+
+function get_symfony_port_from_proxy(): ?int
+{
+    // Remove the $ anchor
+    $status = \Castor\capture("symfony server:status");
+    if (preg_match('|127\.0\.0\.1:(\d+)|', $status, $matches)) {
+        return (int) $matches[1];
+    }
+
+    $currentDir = getcwd();
+    if (preg_match($regex = '|127\.0\.0\.1\:(\d+)$|sm', $status, $matches)) {
+        dd($matches);
+        return $matches[1];
+    } else {
+        dd(badRexex: $regex, status: $status);
+    }
+    dd($status);
+
+    // Fetch the proxy status page
+    $response = http_request('GET', 'http://127.0.0.1:7080', [
+//        'content-type' => 'application/json',
+    ]);
+    dd($response->getContent());
+
+    if ($content === false) {
+        return null;
+    }
+
+    // Split into lines and find our directory
+    $lines = explode("\n", $content);
+
+    foreach ($lines as $line) {
+        // Look for line containing current directory and a port
+        if (strpos($line, $currentDir) !== false) {
+            if (preg_match('/127\.0\.0\.1:(\d+)/', $line, $matches)) {
+                return (int) $matches[1];
+            }
+        }
+    }
+
+    return null;
 }

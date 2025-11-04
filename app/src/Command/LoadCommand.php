@@ -42,6 +42,7 @@ class LoadCommand
             $product->description = $p['description'];
             $product->stock = $p['stock'];
             $product->imageUrl = $p['thumbnail'];
+            $product->category = $p['category'];
         }
         $this->entityManager->flush();
 		$io->success(self::class . " success.");
