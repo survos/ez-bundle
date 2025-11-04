@@ -6,8 +6,8 @@ Quick demonstration of survos/ez-bundle functionality.
 
 Try the bundle instantly:
 ```bash
-symfony new ez-products --webapp && cd ez-products && \
-wget https://raw.githubusercontent.com/survos/ez-bundle/main/castor/castor.php && \
+symfony new ez-products --webapp && cd ez-products
+wget https://raw.githubusercontent.com/survos/ez-bundle/main/app/castor.php
 castor build
 ```
 

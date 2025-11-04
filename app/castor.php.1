@@ -19,7 +19,7 @@ function getSkeletonPath(): string
 function setup(): void
 {
     io()->title('Installing required bundles');
-    run('composer req endroid/qr-code-bundle survos/ez-bundle:dev-main easycorp/easyadmin-bundle');
+    run('composer req endroid/qr-code-bundle survos/ez-bundle easycorp/easyadmin-bundle');
 
     io()->title('Creating directories');
     $dirs = ['src/Command', 'src/Entity', 'src/Repository', 'templates'];
