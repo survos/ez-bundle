@@ -24,3 +24,6 @@ Thumbs.db
 # Local environment
 .env.local
 .env.*.local
+
+.castor.stub.php
+.castor

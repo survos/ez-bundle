@@ -165,7 +165,7 @@ function build(): void
     copy_files(); // entities, app:load
     easyadmin();
     database();
-    import();
+    app_load();
     open();
 
     io()->success('Demo application built successfully!');
