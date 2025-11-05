@@ -10,8 +10,8 @@ try {
     import('.castor/vendor/tacman/castor-tools/castor.php');
 //    import('composer://castor-php/php-qa');
 } catch (\Throwable $th) {
-    io()->error("Run\n\ncastor bootstrap");
-    exit();
+    io()->error("Run\n\ncastor bootstrap\n\n and ignore this warning the first time");
+//    io()->error("Run\n\ncastor composer req tacman/castor-tools");
 }
 
 #[AsTask('bootstrap', description: 'bootstrap castor tools')]
