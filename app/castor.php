@@ -1,29 +1,8 @@
 <?php
 
-
-
 use Castor\Attribute\AsTask;
 
 use function Castor\{io, run, fs, variable, finder, http_request, import};
-
-try {
-    import('.castor/vendor/tacman/castor-tools/castor.php');
-//    import('composer://castor-php/php-qa');
-} catch (\Throwable $th) {
-    io()->error("Run\n\ncastor bootstrap\n\n and ignore this warning the first time");
-//    io()->error("Run\n\ncastor composer req tacman/castor-tools");
-}
-
-#[AsTask('bootstrap', description: 'bootstrap castor tools')]
-function bootstrap(): void
-{
-    io()->warning($cmd = 'castor composer req tacman/castor-tools');
-    if (io()->confirm("Run it now?", true)) {
-        run($cmd);
-        io()->error($cmd);
-    }
-}
-
 
 function getBundleName(): string
 {
@@ -36,19 +15,12 @@ function getSkeletonPath(): string
     return sprintf('vendor/%s/app', $bundleName);
 }
 
-#[AsTask('cwd', description: 'display the current working directory')]
-function ez_app_cwd(): void
-{
-    io()->writeln(sprintf('<info>%s</info>', \Castor\context()->workingDirectory));
-}
-
 #[AsTask('setup', description: 'Setup bundles and directories, start server')]
 function setup(): void
 {
     io()->title('Installing required bundles');
     run('composer req endroid/qr-code-bundle survos/ez-bundle:dev-main');
     run('composer req easycorp/easyadmin-bundle');
-    run('composer req symfony/ux-icons');
 
     io()->title('Creating directories');
     $dirs = ['src/Command', 'src/Entity', 'src/Repository', 'templates'];
@@ -111,6 +83,7 @@ function copy_files(): void
     }
 
     $files = [
+        'config/packages/ux_icons.yaml',
         'src/Entity/Product.php',
         'src/Repository/ProductRepository.php',
         'src/Command/LoadCommand.php', // Fixed typo
@@ -138,11 +111,12 @@ function copy_files(): void
         io()->success("Copied {$file}");
     }
 
-    easyadmin(); //
+    // make sure the config file gets picked up.
+    run('bin/console cache:clear');
 }
 
-#[AsTask('app:load', description: 'Import demo data')]
-function app_load(): void
+#[AsTask('load', description: 'load dummyproducts data')]
+function load_data(): void
 {
     io()->title('Importing product data');
     run('bin/console app:load'); // Match your actual command name
@@ -150,7 +124,7 @@ function app_load(): void
 
 #[AsTask('open', description: 'Start web server and open in browser')]
 function open(
-    #[\Castor\Attribute\AsArgument] string $path='/product'
+    #[\Castor\Attribute\AsArgument] string $path='/'
 ): void
 {
     run('symfony open:local --path=' . $path); // Adjust path as needed
@@ -165,11 +139,11 @@ function build(): void
     copy_files(); // entities, app:load
     easyadmin();
     database();
-    app_load();
+    load_data();
     open();
 
     io()->success('Demo application built successfully!');
-    io()->note('Visit the opened browser to see the demo');
+    io()->note("run\n\ncastor ngrok\n\n to scan a QR code and see on a mobile device");
 }
 
 #[AsTask('clean', description: 'Remove generated files and reset')]
@@ -195,4 +169,85 @@ function clean(): void
             io()->success("Removed {$file}");
         }
     }
+}
+
+#[AsTask('ngrok', description: 'Start ngrok tunnel to local Symfony server')]
+function ngrok(
+    string $subdomain = '',
+    string $region = '',
+    bool $inspect = true
+): void
+{
+    io()->title('Starting ngrok tunnel');
+
+    $port = get_symfony_port_from_proxy();
+
+    if (!$port) {
+        io()->error('Could not detect Symfony server port');
+        return;
+    }
+
+    io()->success("Found Symfony server on port {$port}");
+
+    $command = "ngrok http localhost:{$port}";
+
+    if ($subdomain) {
+        $command .= " --subdomain={$subdomain}";
+    }
+
+    if ($region) {
+        $command .= " --region={$region}";
+    }
+
+    if (!$inspect) {
+        $command .= " --inspect=false";
+    }
+
+    io()->note('Starting ngrok tunnel...');
+    io()->note($command);
+    io()->note('Press Ctrl+C to stop');
+
+    run($command);
+}
+
+function get_symfony_port_from_proxy(): ?int
+{
+    // Remove the $ anchor
+    $status = \Castor\capture("symfony server:status");
+    if (preg_match('|127\.0\.0\.1:(\d+)|', $status, $matches)) {
+        return (int) $matches[1];
+    }
+
+    $currentDir = getcwd();
+    if (preg_match($regex = '|127\.0\.0\.1\:(\d+)$|sm', $status, $matches)) {
+        dd($matches);
+        return $matches[1];
+    } else {
+        dd(badRexex: $regex, status: $status);
+    }
+    dd($status);
+
+    // Fetch the proxy status page
+    $response = http_request('GET', 'http://127.0.0.1:7080', [
+//        'content-type' => 'application/json',
+    ]);
+    dd($response->getContent());
+
+    if ($content === false) {
+        return null;
+    }
+
+    // Split into lines and find our directory
+    $lines = explode("\n", $content);
+
+    foreach ($lines as $line) {
+        // Look for line containing current directory and a port
+        if (strpos($line, $currentDir) !== false) {
+            if (preg_match('/127\.0\.0\.1:(\d+)/', $line, $matches)) {
+                return (int) $matches[1];
+            }
+        }
+    }
+
+    return null;
 }
