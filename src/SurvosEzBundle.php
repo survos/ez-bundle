@@ -68,7 +68,6 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
         $attributeClass = EzAdmin::class;
         $entityDir = $container->getParameter('kernel.project_dir') . '/src/Entity';
         $indexedClasses = [];
-        $map = [];
         foreach ($this->getClassesInDirectory($entityDir) as $class) {
             assert(class_exists($class), "Missing $class in $entityDir");
             $ref = new ReflectionClass($class);
@@ -78,20 +77,20 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
                 $indexedClasses[] = $class;
             }
 //            $instance = $ref->newInstance();
-
-            $fields = [];
-            foreach ($ref->getProperties() as $prop) {
-                $attrs = $prop->getAttributes(EzField::class);
-                if (!$attrs) continue;
-                /** @var EzField $ef */
-                $ef = $attrs[0]->newInstance();
-
-                $fields[$prop->getName()] = (array)$ef;
-            }
-
-            $map[$class] = ['fields' => $fields];
-//        dd($indexedClasses);
         }
+
+        $fields = [];
+        foreach ($ref->getProperties() as $prop) {
+            $attrs = $prop->getAttributes(EzField::class);
+            if (!$attrs) continue;
+            /** @var EzField $ef */
+            $ef = $attrs[0]->newInstance();
+
+            $fields[$prop->getName()] = (array)$ef;
+        }
+
+        $map[$class] = ['fields' => $fields];
+//        dd($indexedClasses);
 
         $container->setParameter('ez.indexed_entities', $indexedClasses);
 

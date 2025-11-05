@@ -1,5 +1,6 @@
 # BarcodeBundle
 
+<<<<<<< HEAD
 # ez-bundle App
 
 Quick demonstration of survos/ez-bundle functionality.  To make this somewhat of a real-world example, this application
@@ -42,6 +43,11 @@ vendor/bin/castor build
 ```
 
 
+Symfony Bundle for the [picqer/php-barcode-generator](https://github.com/picqer/php-barcode-generator) library, to generate an SVG barcode within twig.
+
+# Barcode Bundle Demo
+
+Quick demonstration of survos/barcode-bundle functionality.
 
 ## Prerequisites
 
@@ -112,6 +118,13 @@ castor clean  # Removes all demo files
 **Bundle not installed**: Run `castor setup` first before other commands
 
 ## Demo Application
+
+Try the bundle instantly:
+```bash
+symfony new barcode-demo --webapp && cd barcode-demo && \
+wget https://raw.githubusercontent.com/survos/barcode-bundle/main/castor/castor.php && \
+castor build
+```
 
 See the [demo README](castor/README.md) for step-by-step instructions.
 

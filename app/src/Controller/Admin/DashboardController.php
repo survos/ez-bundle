@@ -22,9 +22,7 @@ class DashboardController extends AbstractDashboardController
 
     public function configureDashboard(): Dashboard
     {
-        return Dashboard::new()
-            ->setTitle('Dummy Products with QR codes')
-            ;
+        return Dashboard::new()->setTitle('Dummy Products with QR codes');
     }
 
     #[AdminRoute(name: 'product_show', path: '/show/{sku}')]
@@ -32,6 +30,8 @@ class DashboardController extends AbstractDashboardController
         #[MapEntity(mapping: ['sku' => 'sku'])] Product $product): Response
     {
         return $this->render('product.html.twig', ['product' => $product]);
+//        dd($sku);
+
     }
 
     public function configureMenuItems(): iterable
