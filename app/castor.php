@@ -5,9 +5,10 @@
 use Castor\Attribute\AsTask;
 
 use function Castor\{io, run, fs, variable, finder, http_request, import};
-//    import('.castor/vendor/tacman/castor-tools/castor.php');
-    import('composer://castor-php/php-qa');
+
 try {
+    import('.castor/vendor/tacman/castor-tools/castor.php');
+//    import('composer://castor-php/php-qa');
 } catch (\Throwable $th) {
     io()->error("Run\n\ncastor bootstrap");
     exit();
