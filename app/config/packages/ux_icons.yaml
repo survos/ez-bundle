@@ -1,0 +1,30 @@
+ux_icons:
+    default_icon_attributes:
+        # Default:
+        fill:                currentColor
+        height: 30px
+        width: 30px
+
+        # Example:
+        # class:               icon
+
+    aliases:              []
+
+        # Examples:
+        # dots:                'clarity:ellipsis-horizontal-line'
+        # privacy:             'bi:cookie'
+
+    # Configuration for the remote icon service.
+    iconify:
+        enabled:              true
+
+        # Whether to download icons "on demand".
+        on_demand:            true
+
+        # The endpoint for the Iconify icons API.
+        endpoint:             'https://api.iconify.design'
+
+    # Ignore error when an icon is not found.
+    # Set to 'true' to fail silently.
+    ignore_not_found:     false
+

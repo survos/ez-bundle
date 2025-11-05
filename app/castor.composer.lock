@@ -1,0 +1,108 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "b7808d8ce894206380744715f90ab267",
+    "packages": [
+        {
+            "name": "castor-php/php-qa",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/castor-php/php-qa.git",
+                "reference": "88c5144e24d05ac04b0deff073f2c41a4aba288c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/castor-php/php-qa/zipball/88c5144e24d05ac04b0deff073f2c41a4aba288c",
+                "reference": "88c5144e24d05ac04b0deff073f2c41a4aba288c",
+                "shasum": ""
+            },
+            "require-dev": {
+                "jolicode/castor": "^0.22.1"
+            },
+            "default-branch": true,
+            "type": "castor-plugin",
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "CastorPhp\\PhpQa\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joel Wurtz",
+                    "email": "jwurtz@jolicode.com"
+                }
+            ],
+            "description": "PHP Quality tools functions for castor",
+            "support": {
+                "issues": "https://github.com/castor-php/php-qa/issues",
+                "source": "https://github.com/castor-php/php-qa/tree/main"
+            },
+            "time": "2025-10-27T16:22:18+00:00"
+        },
+        {
+            "name": "tacman/castor-tools",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tacman/castor-tools.git",
+                "reference": "7d4369a06d7a1947e6ce44c21093f0a6f529e11b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tacman/castor-tools/zipball/7d4369a06d7a1947e6ce44c21093f0a6f529e11b",
+                "reference": "7d4369a06d7a1947e6ce44c21093f0a6f529e11b",
+                "shasum": ""
+            },
+            "require-dev": {
+                "jolicode/castor": "^1.0"
+            },
+            "type": "castor-plugin",
+            "autoload": {
+                "files": [
+                    "src/functions.php"
+                ],
+                "psr-4": {
+                    "Tacman\\CastorTools\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tac Tacelosky",
+                    "email": "tacman@gmail.com"
+                }
+            ],
+            "description": "Extend castor with some common tools",
+            "support": {
+                "issues": "https://github.com/tacman/castor-tools/issues",
+                "source": "https://github.com/tacman/castor-tools/tree/1.0.0"
+            },
+            "time": "2025-10-25T12:09:18+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "castor-php/php-qa": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
+}

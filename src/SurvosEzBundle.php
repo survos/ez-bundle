@@ -12,6 +12,7 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -123,4 +124,17 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
 
         return $classes;
     }
+
+    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        // Register Twig namespace for this bundle
+        $builder->prependExtensionConfig('twig', [
+            'paths' => [
+                dirname(__DIR__) . '/templates' => 'SurvosEz',
+                // Or if templates are in Resources/views:
+                // dirname(__DIR__) . '/Resources/views' => 'SurvosEz',
+            ]
+        ]);
+    }
+
 }

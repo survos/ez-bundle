@@ -1,10 +1,13 @@
 # SurvosEzBundle
 
-A Symfony bundle for ez functionality.
+Lightweight tools that extend EasyAdmin (easycorp/easyadmin-bundle).
 
 ## Features
 
-- Console command for CLI operations
+- Define default fields via attributes
+- Generate all entity crud controllers via a single command (code-bundle?)
+- Automatic configuration of filters
+- Base controller defaults to read-only for non-admins
 
 ## Installation
 
@@ -12,15 +15,6 @@ Install the bundle using Composer:
 
 ```bash
 composer require survos/ez-bundle
-```
-
-If you're using Symfony Flex, the bundle will be automatically registered. Otherwise, add it to your `config/bundles.php`:
-
-```php
-return [
-    // ...
-    Survos\EzBundle\SurvosEzBundle::class => ['all' => true],
-];
 ```
 
 ## Usage

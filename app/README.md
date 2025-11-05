@@ -1,23 +1,54 @@
 # BarcodeBundle
 
-# Barcode Bundle Demo
+# ez-bundle App
 
-Quick demonstration of survos/ez-bundle functionality.
+Quick demonstration of survos/ez-bundle functionality.  To make this somewhat of a real-world example, this application
 
-Try the bundle instantly:
+* uses easy-admin dashboard as the home page
+* displays a QR code that when scanned opens up a mobile-friendly product page
+
+To see it in action
+
+* Go to ez-products.survos.com
+* run the app locally (pre-configured for sqlite, this directory)
+* scaffold the app in a new Symfony project.  This is the best way to see what exact steps are necessary to create the app from scratch, or what steps are needed to integrate the bundle into your own project.
+
+## Run locally
+
+Navigate to the ez-bundle/app directory
+
+```bash
+composer install
+bin/console doctrine:schema:update
+bin/console app:load
+symfony server:start -d
+```
+
+If you want to test it on your local device, install ngrok or something similar.
+
+## Scaffold using Castor
+
+First, install castor.  The recommended way is to install the stand-alone castor application, but you can also install it as a package and run it from the vendor directory.
+
+
+
+Instead of running the bash script above, you can create a new project, fetch the castor file, then re-build the application one file at a time.  
+
 ```bash
 symfony new ez-products --webapp && cd ez-products
-wget https://raw.githubusercontent.com/survos/ez-bundle/main/app/castor.php
-castor build
+composer req jolicode/castor --dev
+wget https://raw.githubusercontent.com/survos/ez-bundle/main/app/castor.php -O castor.php
+vendor/bin/castor build
 ```
 
 
 
 ## Prerequisites
 
-- PHP 8.2+
+- PHP 8.4+
 - Symfony CLI
 - [Castor](https://castor.jolicode.com/) task runner
+- ngrok (for testing local dev on mobile device)
 
 ## Install Castor
 ```bash

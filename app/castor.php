@@ -1,8 +1,28 @@
 <?php
 
+
+
 use Castor\Attribute\AsTask;
 
-use function Castor\{io, run, fs, variable, finder, http_request};
+use function Castor\{io, run, fs, variable, finder, http_request, import};
+//    import('.castor/vendor/tacman/castor-tools/castor.php');
+    import('composer://castor-php/php-qa');
+try {
+} catch (\Throwable $th) {
+    io()->error("Run\n\ncastor bootstrap");
+    exit();
+}
+
+#[AsTask('bootstrap', description: 'bootstrap castor tools')]
+function bootstrap(): void
+{
+    io()->warning($cmd = 'castor composer req tacman/castor-tools');
+    if (io()->confirm("Run it now?", true)) {
+        run($cmd);
+        io()->error($cmd);
+    }
+}
+
 
 function getBundleName(): string
 {
@@ -15,11 +35,19 @@ function getSkeletonPath(): string
     return sprintf('vendor/%s/app', $bundleName);
 }
 
+#[AsTask('cwd', description: 'display the current working directory')]
+function ez_app_cwd(): void
+{
+    io()->writeln(sprintf('<info>%s</info>', \Castor\context()->workingDirectory));
+}
+
 #[AsTask('setup', description: 'Setup bundles and directories, start server')]
 function setup(): void
 {
     io()->title('Installing required bundles');
-    run('composer req endroid/qr-code-bundle survos/ez-bundle:dev-main easycorp/easyadmin-bundle');
+    run('composer req endroid/qr-code-bundle survos/ez-bundle:dev-main');
+    run('composer req easycorp/easyadmin-bundle');
+    run('composer req symfony/ux-icons');
 
     io()->title('Creating directories');
     $dirs = ['src/Command', 'src/Entity', 'src/Repository', 'templates'];
@@ -108,10 +136,12 @@ function copy_files(): void
         fs()->copy($source, $target);
         io()->success("Copied {$file}");
     }
+
+    easyadmin(); //
 }
 
-#[AsTask('import', description: 'Import demo data')]
-function import(): void
+#[AsTask('app:load', description: 'Import demo data')]
+function app_load(): void
 {
     io()->title('Importing product data');
     run('bin/console app:load'); // Match your actual command name

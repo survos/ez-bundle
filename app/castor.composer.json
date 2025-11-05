@@ -1,0 +1,6 @@
+{
+    "require": {
+        "tacman/castor-tools": "^1.0",
+        "castor-php/php-qa": "dev-main"
+    }
+}
