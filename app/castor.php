@@ -47,11 +47,9 @@ function easyadmin(): void
 
     foreach (finder()->in($skeletonPath)->files() as $file) {
         fs()->copy($file->getRealPath(), $targetFile = 'src/Controller/Admin/' . $file->getBasename());
-        dump($file->getRealPath(), $targetFile);
         io()->write(file_get_contents($targetFile));
     }
     run('bin/console cache:clear');
-    open();
 }
 
 #[AsTask('database', description: 'Configure and initialize database')]
