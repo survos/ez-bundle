@@ -46,10 +46,13 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
 
     public function configure(DefinitionConfigurator $definition): void
     {
-        $definition->rootNode()
+        /** @var \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition $rootNode */
+        $rootNode = $definition->rootNode();
+
+        $rootNode
             ->children()
 //            ->arrayNode('entity_dirs')->defaultValue(['src/Entity'])->end()
-            ->booleanNode('enabled')->defaultTrue()->end()
+                ->booleanNode('enabled')->defaultTrue()->end()
             ->end();
     }
 

@@ -74,8 +74,7 @@ abstract class BaseCrudController extends AbstractCrudController
         }
 
         if (!empty($admin['pageSizes']) && \is_array($admin['pageSizes'])) {
-            $crud = $crud->setPaginatorPageSize($admin['pageSizes'][0] ?? 25)
-                         ->setPaginatorPageSizeOptions($admin['pageSizes']);
+            $crud = $crud->setPaginatorPageSize($admin['pageSizes'][0] ?? 25);
         }
 
         // Respect hidden pages if configured
@@ -268,8 +267,18 @@ abstract class BaseCrudController extends AbstractCrudController
         if (!$entity) {
             return null;
         }
-        $meta = $entity->getPropertyMetadata($property);
-        return $meta?->get('type');
+
+        $metadata = $entity->getClassMetadata();
+
+        if ($metadata->hasField($property)) {
+            return $metadata->getTypeOfField($property);
+        }
+
+        if ($metadata->hasAssociation($property)) {
+            return $metadata->isSingleValuedAssociation($property) ? 'association' : 'collection';
+        }
+
+        return null;
     }
 
     private function isAssociation(?EntityDto $entity, string $property): bool
@@ -277,8 +286,8 @@ abstract class BaseCrudController extends AbstractCrudController
         if (!$entity) {
             return false;
         }
-        $meta = $entity->getPropertyMetadata($property);
-        return (bool) $meta?->get('isAssociation');
+
+        return $entity->getClassMetadata()->hasAssociation($property);
     }
 
     public function push(FieldInterface $field): ?FieldInterface
