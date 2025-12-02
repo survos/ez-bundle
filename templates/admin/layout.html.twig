@@ -1,0 +1,59 @@
+{# packages/SurvosEzBundle/templates/admin/layout.html.twig #}
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{# Make the top-right container a flex row so items align #}
+{% block header_custom_menu_wrapper %}
+    <div class="navbar-custom-menu d-flex align-items-center gap-2">
+        {{ block('header_custom_menu') }}
+    </div>
+{% endblock %}
+
+{# Inside that row: user menu + locale dropdown + gear #}
+{% block header_custom_menu %}
+    {# original user dropdown (avatar + name) #}
+    {{ parent() }}
+
+    {# locale dropdown #}
+    {% if ea.dashboardLocales %}
+        <twig:ea:ActionMenu class="locale-menu ms-2">
+            <twig:ea:ActionMenu:Button
+                class="locale-menu-button"
+                data-bs-offset="0,5"
+                withoutDropdownToggleMarker
+            >
+                <span class="text-uppercase">
+                    {{ app.request.locale }}
+                </span>
+            </twig:ea:ActionMenu:Button>
+
+            <twig:ea:ActionMenu:Overlay>
+                <twig:ea:ActionMenu:ActionList>
+                    {% for localeDto in ea.dashboardLocales %}
+                        {% if ea.usePrettyUrls %}
+                            {% set current_route_params = app.request.attributes.get('_route_params') %}
+                            {% set url = ea_url(current_route_params)
+                                .set('_locale', localeDto.locale)
+                                .set('entityId', app.request.attributes.get('entityId'))
+                            %}
+                        {% else %}
+                            {% set url = ea_url().set('_locale', localeDto.locale) %}
+                        {% endif %}
+
+                        <twig:ea:ActionMenu:ActionList:Item
+                            class="{{ app.request.locale == localeDto.locale ? 'active' }}"
+                            url="{{ url.generateUrl() }}"
+                            icon="{{ localeDto.icon }}"
+                            label="{{ localeDto.name }}"
+                        />
+                    {% endfor %}
+                </twig:ea:ActionMenu:ActionList>
+            </twig:ea:ActionMenu:Overlay>
+        </twig:ea:ActionMenu>
+    {% endif %}
+
+    {# gear dropdown, still inside same flex row #}
+    {{ settings_dropdown }}
+{% endblock %}
+
+{# Don’t render settings dropdown again outside the row #}
+{% block settings_dropdown_wrapper %}{% endblock %}

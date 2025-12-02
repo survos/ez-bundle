@@ -138,6 +138,18 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
                 // dirname(__DIR__) . '/Resources/views' => 'SurvosEz',
             ]
         ]);
+
+//        // Always tell EasyAdmin to use our layout
+//        $container->extension('easy_admin', [
+//            'design' => [
+//                'templates' => [
+//                    // this is the "layout" EasyAdmin will use internally
+//                    'layout' => '@SurvosEz/admin/layout.html.twig',
+//                ],
+//            ],
+//        ]);
+
+
     }
 
 }
