@@ -18,26 +18,25 @@
         <twig:ea:ActionMenu class="locale-menu ms-2">
             <twig:ea:ActionMenu:Button
                 class="locale-menu-button"
+                icon="fas fa-language"
                 data-bs-offset="0,5"
                 withoutDropdownToggleMarker
             >
-                <span class="text-uppercase">
-                    {{ app.request.locale }}
+                {{ ux_icon('mdi:language') }}
+{#                {{ app.request.locale }}#}
+                <span class="text-uppercasexx">
+                    {{ app.request.locale|language_name }}
                 </span>
             </twig:ea:ActionMenu:Button>
 
             <twig:ea:ActionMenu:Overlay>
                 <twig:ea:ActionMenu:ActionList>
                     {% for localeDto in ea.dashboardLocales %}
-                        {% if ea.usePrettyUrls %}
                             {% set current_route_params = app.request.attributes.get('_route_params') %}
                             {% set url = ea_url(current_route_params)
                                 .set('_locale', localeDto.locale)
                                 .set('entityId', app.request.attributes.get('entityId'))
                             %}
-                        {% else %}
-                            {% set url = ea_url().set('_locale', localeDto.locale) %}
-                        {% endif %}
 
                         <twig:ea:ActionMenu:ActionList:Item
                             class="{{ app.request.locale == localeDto.locale ? 'active' }}"
