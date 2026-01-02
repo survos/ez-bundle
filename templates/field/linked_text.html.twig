@@ -1,0 +1,10 @@
+{# @SurvosEz/field/linked_text.html.twig #}
+{% set route = field.customOptions.get('link_route') %}
+{% if route %}
+    {% set paramName = field.customOptions.get('link_param') ?? 'id' %}
+    {% set prop = field.customOptions.get('link_property') %}
+    {% set paramValue = prop ? attribute(entity.instance, prop) : entity.primaryKeyValue %}
+    <a href="{{ path(route, {(paramName): paramValue}) }}">{{ field.formattedValue ?? field.value }}</a>
+{% else %}
+    {{ field.formattedValue ?? field.value }}
+{% endif %}

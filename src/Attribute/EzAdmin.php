@@ -7,26 +7,36 @@ use Attribute;
 
 /**
  * Entity-level admin metadata.
- * Attach to Doctrine entities to steer default CRUD behavior and UI affordances.
  *
  * Example:
- *   #[EzAdmin(label: 'Fortepan Object', icon: 'fa-regular fa-image', defaultSort: ['year' => 'DESC'], indexMax: 12)]
+ *   #[EzAdmin(
+ *      label: 'Product',
+ *      defaultSort: ['price' => 'DESC'],
+ *      indexMax: 12,
+ *      editRoles: ['ROLE_ADMIN','ROLE_EDITOR'],
+ *      readOnlyByDefault: true
+ *   )]
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 final class EzAdmin
 {
     /**
-     * @param array<string, 'ASC'|'DESC'|int|string> $defaultSort e.g. ['year' => 'DESC', 'id' => 'ASC']
-     * @param non-empty-string[]|null                $hiddenPages e.g. [Page::NEW, Page::EDIT]
-     * @param int[]|null                             $pageSizes   e.g. [25, 50, 100]
+     * @param array<string, 'ASC'|'DESC'|int|string>|null $defaultSort
+     * @param non-empty-string[]|null                    $hiddenPages
+     * @param int[]|null                                 $pageSizes
+     * @param non-empty-string[]|null                    $editRoles Roles allowed to mutate (NEW/EDIT/DELETE)
      */
     public function __construct(
-        public ?string $label = null,           // If null, derive from short class name
-        public ?string $icon = null,            // Font Awesome / icon key (optional)
-        public ?string $crudController = null,  // Optional custom CRUD controller FQCN
-        public ?array  $defaultSort = null,     // Default sorting for INDEX
-        public ?int    $indexMax = null,        // Preferred max fields in INDEX (replaces EA's hard-coded 7)
-        public ?array  $hiddenPages = null,     // Hide pages entirely (by Page::*)
-        public ?array  $pageSizes = null,       // Paginator page sizes preference
+        public ?string $label = null,
+        public ?string $icon = null,
+        public ?string $crudController = null,
+        public ?array  $defaultSort = null,
+        public ?int    $indexMax = null,
+        public ?array  $hiddenPages = null,
+        public ?array  $pageSizes = null,
+
+        // Security/UX defaults
+        public ?array $editRoles = null,
+        public bool $readOnlyByDefault = true,
     ) {}
 }
