@@ -90,9 +90,12 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $actions = parent::configureActions($actions)
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+        $actions = parent::configureActions($actions);
 
+        // this is on by default
+//        $actions
+//            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+//        return $actions;
         if ($this->isReadOnly()) {
             // Hide mutation actions entirely (clean read-only UX)
             return $actions->disable(Action::NEW, Action::EDIT, Action::DELETE, Action::BATCH_DELETE);

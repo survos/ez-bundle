@@ -14,10 +14,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Survos\EzBundle\Controller\AbstractEzCrudController;
 use Survos\EzBundle\Controller\BaseCrudController;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ProductCrudController extends BaseCrudController
+class ProductCrudController extends AbstractEzCrudController
 {
 
     public static function getEntityFqcn(): string
