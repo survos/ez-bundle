@@ -30,6 +30,7 @@ use Survos\EzBundle\Attribute\Page;
 use Survos\EzBundle\Service\EzService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Extend this in your app CRUDs.
@@ -39,11 +40,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class BaseCrudController extends AbstractCrudController
 {
-    private array $seen = [];
+    private array $seen;
+    // although empty, phpstan complains about not calling the parent constructor. maybe set $seen?
     public function __construct(
-        protected UrlGeneratorInterface $urlGenerator,
-        #[Autowire(service: EzService::class)] private readonly EzService $ez,
     ) {
+        $this->seen = [];
+    }
+
+    protected EzService $ez;
+    protected UrlGeneratorInterface $urlGenerator;
+
+    #[Required]
+    public function setDependencies(
+        EzService $ez,
+        UrlGeneratorInterface $urlGenerator
+    ): void {
+        $this->ez = $ez;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function configureActions(Actions $actions): Actions
