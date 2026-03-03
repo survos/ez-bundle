@@ -19,7 +19,7 @@
         "symfony/dependency-injection": "^7.4||^8.0",
         "symfony/http-kernel": "^7.4||^8.0",
         "symfony/console": "^7.4||^8.0",
-        "easycorp/easyadmin-bundle": "^4.25",
+        "easycorp/easyadmin-bundle": "^4.25|^5.0",
         "symfony/framework-bundle": "^7.4||^8.0"
     },
     "require-dev": {
