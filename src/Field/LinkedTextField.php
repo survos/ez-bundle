@@ -23,7 +23,7 @@ final class LinkedTextField implements FieldInterface
     public const OPTION_LINK_PARAM = 'link_param';
     public const OPTION_LINK_PROPERTY = 'link_property';
 
-    public static function new(string $propertyName, ?string $label = null): self
+    public static function new(string $propertyName, \Symfony\Contracts\Translation\TranslatableInterface|string|bool|null $label = null): FieldInterface
     {
         $self = new self();
         $self->setProperty($propertyName);
