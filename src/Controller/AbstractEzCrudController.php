@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -26,6 +27,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Survos\EzBundle\Attribute\Page;
 use Survos\EzBundle\Field\LinkedTextField;
 use Survos\EzBundle\Service\EzService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -86,6 +88,20 @@ abstract class AbstractEzCrudController extends AbstractCrudController
     protected function preferredFields(string $pageName): iterable
     {
         return [];
+    }
+
+    public function autocomplete(AdminContext $context): JsonResponse
+    {
+        $autocompleteContext = $context->getRequest()->query->all(AssociationField::PARAM_AUTOCOMPLETE_CONTEXT);
+
+        if (!isset($autocompleteContext['originatingPage'], $autocompleteContext['propertyName'])) {
+            return new JsonResponse([
+                'results' => [],
+                'error' => 'EasyAdmin autocomplete endpoints require autocompleteContext[originatingPage] and autocompleteContext[propertyName].',
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        return parent::autocomplete($context);
     }
 
     public function configureActions(Actions $actions): Actions
