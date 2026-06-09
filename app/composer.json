@@ -5,7 +5,7 @@
     "keywords": ["symfony","symfony-ux"],
     "prefer-stable": true,
     "require": {
-        "php": "^8.4",
+        "php": "^8.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/dbal": "^3.10.3",
