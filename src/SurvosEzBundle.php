@@ -10,6 +10,7 @@ use Survos\EzBundle\Command\MakeAdminCommand;
 use Survos\EzBundle\Service\EzService;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -47,7 +48,7 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
-        $container->addCompilerPass($this);
+        $container->addCompilerPass($this, PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 
     public function process(ContainerBuilder $container): void
