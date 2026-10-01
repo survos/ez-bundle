@@ -15,15 +15,15 @@
     "type": "symfony-bundle",
     "require": {
         "php": "^8.5",
-        "symfony/config": "^8.1",
-        "symfony/dependency-injection": "^8.1",
-        "symfony/http-kernel": "^8.1",
-        "symfony/console": "^8.1",
+        "symfony/config": "^7.4||^8.1",
+        "symfony/dependency-injection": "^7.4||^8.1",
+        "symfony/http-kernel": "^7.4||^8.1",
+        "symfony/console": "^7.4||^8.1",
         "easycorp/easyadmin-bundle": "^4.25|^5.0",
-        "symfony/framework-bundle": "^8.1"
+        "symfony/framework-bundle": "^7.4||^8.1"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^8.1",
+        "symfony/phpunit-bridge": "^7.4||^8.1",
         "nette/php-generator": "^4.2",
         "phpstan/phpstan-symfony": "^2.0"
     },
