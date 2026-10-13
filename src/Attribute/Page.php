@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Survos\EzBundle\Attribute;
@@ -9,10 +10,10 @@ namespace Survos\EzBundle\Attribute;
  */
 final class Page
 {
-    public const INDEX  = 'index';
+    public const INDEX = 'index';
     public const DETAIL = 'detail';
-    public const NEW    = 'new';
-    public const EDIT   = 'edit';
+    public const NEW = 'new';
+    public const EDIT = 'edit';
 
     /** @return non-empty-string[] */
     public static function all(): array

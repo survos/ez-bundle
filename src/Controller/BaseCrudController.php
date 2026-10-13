@@ -1,9 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Survos\EzBundle\Controller;
 
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -15,11 +15,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
@@ -29,7 +26,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\NumericFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Survos\EzBundle\Attribute\Page;
 use Survos\EzBundle\Service\EzService;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -42,6 +38,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 abstract class BaseCrudController extends AbstractCrudController
 {
     private array $seen;
+
     // although empty, phpstan complains about not calling the parent constructor. maybe set $seen?
     public function __construct(
     ) {
@@ -54,7 +51,7 @@ abstract class BaseCrudController extends AbstractCrudController
     #[Required]
     public function setDependencies(
         EzService $ez,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
     ): void {
         $this->ez = $ez;
         $this->urlGenerator = $urlGenerator;
@@ -80,7 +77,7 @@ abstract class BaseCrudController extends AbstractCrudController
         if (!empty($admin['label'])) {
             $crud = $crud
                 ->setEntityLabelInSingular($admin['label'])
-                ->setEntityLabelInPlural($admin['label'] . 's');
+                ->setEntityLabelInPlural($admin['label'].'s');
         }
 
         if (!empty($admin['defaultSort']) && \is_array($admin['defaultSort'])) {
@@ -104,8 +101,8 @@ abstract class BaseCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
-        $class  = static::getEntityFqcn();
-        $map    = $this->ez->getFields($class);
+        $class = static::getEntityFqcn();
+        $map = $this->ez->getFields($class);
         $entity = $this->getContext()?->getEntity();
 
         if (!$map || !$entity instanceof EntityDto) {
@@ -149,7 +146,7 @@ abstract class BaseCrudController extends AbstractCrudController
             // Optional: handle explicit filterType/options from attribute
             if (!empty($cfg['filterType'])) {
                 // You can extend here to honor 'choice', custom options, etc.
-                if ($cfg['filterType'] === 'choice' && !empty($cfg['filterOptions']['choices'])) {
+                if ('choice' === $cfg['filterType'] && !empty($cfg['filterOptions']['choices'])) {
                     $filters = $filters->add(
                         ChoiceFilter::new($name)->setChoices($cfg['filterOptions']['choices'])
                     );
@@ -162,7 +159,7 @@ abstract class BaseCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $class   = static::getEntityFqcn();
+        $class = static::getEntityFqcn();
         $fieldsC = $this->ez->getFields($class);
 
         $entity = $this->getContext()?->getEntity();
@@ -173,16 +170,18 @@ abstract class BaseCrudController extends AbstractCrudController
                 $property = $field->getAsDto()->getProperty();
                 yield $this->enumType($entity, $property) ? ChoiceField::new($property) : $field;
             }
+
             return;
         }
 
-        $indexNames = $pageName === Crud::PAGE_INDEX
+        $indexNames = Crud::PAGE_INDEX === $pageName
             ? $this->ez->getIndexFieldNames($class, 7)
             : $this->orderedNamesForPage($fieldsC, $pageName);
 
         // If no explicit index/showOn rules, fall back to parent defaults
         if (!$indexNames) {
             yield from parent::configureFields($pageName);
+
             return;
         }
 
@@ -204,8 +203,8 @@ abstract class BaseCrudController extends AbstractCrudController
             if (!empty($cfg['templatePath'])) {
                 $field = $field->setTemplatePath($cfg['templatePath']);
             }
-            if (\array_key_exists('sortable', $cfg) && $cfg['sortable'] !== null) {
-                $field = $field->setSortable((bool)$cfg['sortable']);
+            if (\array_key_exists('sortable', $cfg) && null !== $cfg['sortable']) {
+                $field = $field->setSortable((bool) $cfg['sortable']);
             }
 
             yield $field;
@@ -214,6 +213,7 @@ abstract class BaseCrudController extends AbstractCrudController
 
     /**
      * Build an ordered list of field names for a given page using EzField::order + showOn/hideOn.
+     *
      * @return string[]
      */
     private function orderedNamesForPage(array $fieldsCfg, string $pageName): array
@@ -232,7 +232,7 @@ abstract class BaseCrudController extends AbstractCrudController
             }
 
             // For index, require 'index: true' to avoid flooding
-            if ($pageName === Crud::PAGE_INDEX && !($cfg['index'] ?? false)) {
+            if (Crud::PAGE_INDEX === $pageName && !($cfg['index'] ?? false)) {
                 continue;
             }
 
@@ -240,17 +240,18 @@ abstract class BaseCrudController extends AbstractCrudController
         }
 
         asort($wanted, \SORT_NUMERIC);
+
         return array_keys($wanted);
     }
 
     private function pageToKey(string $eaPage): string
     {
         return match ($eaPage) {
-            Crud::PAGE_INDEX  => Page::INDEX,
+            Crud::PAGE_INDEX => Page::INDEX,
             Crud::PAGE_DETAIL => Page::DETAIL,
-            Crud::PAGE_NEW    => Page::NEW,
-            Crud::PAGE_EDIT   => Page::EDIT,
-            default           => $eaPage,
+            Crud::PAGE_NEW => Page::NEW,
+            Crud::PAGE_EDIT => Page::EDIT,
+            default => $eaPage,
         };
     }
 
@@ -275,8 +276,8 @@ abstract class BaseCrudController extends AbstractCrudController
 
         return match ($type) {
             'integer', 'bigint', 'smallint' => IntegerField::new($name),
-            'float', 'decimal', 'numeric'   => NumberField::new($name),
-            'boolean'                       => BooleanField::new($name),
+            'float', 'decimal', 'numeric' => NumberField::new($name),
+            'boolean' => BooleanField::new($name),
             'datetime', 'datetimetz', 'date','time' => DateTimeField::new($name),
             default => $this->isAssociation($entity, $name)
                 ? AssociationField::new($name)
@@ -331,7 +332,7 @@ abstract class BaseCrudController extends AbstractCrudController
             return null;
         }
         $this->seen[] = $property;
+
         return $field;
     }
-
 }

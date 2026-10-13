@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Survos\EzBundle\Controller;
@@ -8,9 +9,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -27,8 +28,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use Survos\EzBundle\Attribute\Page;
 use Survos\EzBundle\Field\LinkedTextField;
 use Survos\EzBundle\Service\EzService;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -109,9 +110,9 @@ abstract class AbstractEzCrudController extends AbstractCrudController
         $actions = parent::configureActions($actions);
 
         // this is on by default
-//        $actions
-//            ->add(Crud::PAGE_INDEX, Action::DETAIL);
-//        return $actions;
+        //        $actions
+        //            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+        //        return $actions;
         if ($this->isReadOnly()) {
             // Hide mutation actions entirely (clean read-only UX)
             return $actions->disable(Action::NEW, Action::EDIT, Action::DELETE, Action::BATCH_DELETE);
@@ -135,7 +136,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
         if (!empty($admin['label'])) {
             $crud = $crud
                 ->setEntityLabelInSingular($admin['label'])
-                ->setEntityLabelInPlural($admin['label'] . 's');
+                ->setEntityLabelInPlural($admin['label'].'s');
         }
 
         if (!empty($admin['defaultSort']) && \is_array($admin['defaultSort'])) {
@@ -152,7 +153,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         $class = static::getEntityFqcn();
-        $map   = $this->ez()->getFields($class);
+        $map = $this->ez()->getFields($class);
 
         if (!$map) {
             return $filters;
@@ -197,14 +198,14 @@ abstract class AbstractEzCrudController extends AbstractCrudController
                     break;
                 default:
                     $filters = $filters->add(
-                        \in_array($type, ['association','collection'], true)
+                        \in_array($type, ['association', 'collection'], true)
                             ? EntityFilter::new($name)
                             : TextFilter::new($name)
                     );
             }
 
             if (!empty($cfg['filterType'])) {
-                if ($cfg['filterType'] === 'choice' && !empty($cfg['filterOptions']['choices'])) {
+                if ('choice' === $cfg['filterType'] && !empty($cfg['filterOptions']['choices'])) {
                     $filters = $filters->add(
                         ChoiceFilter::new($name)->setChoices($cfg['filterOptions']['choices'])
                     );
@@ -217,10 +218,10 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $class    = static::getEntityFqcn();
-        $fieldsC  = $this->ez()->getFields($class);
-        $admin    = $this->ez()->getAdmin($class);
-        $indexMax = (int)($admin['indexMax'] ?? 7);
+        $class = static::getEntityFqcn();
+        $fieldsC = $this->ez()->getFields($class);
+        $admin = $this->ez()->getAdmin($class);
+        $indexMax = (int) ($admin['indexMax'] ?? 7);
 
         $seen = [];
 
@@ -235,7 +236,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
         // 2) EzField-driven
         if ($fieldsC) {
-            $names = $pageName === Crud::PAGE_INDEX
+            $names = Crud::PAGE_INDEX === $pageName
                 ? $this->ez()->getIndexFieldNames($class, $indexMax)
                 : $this->orderedNamesForPage($fieldsC, $pageName);
 
@@ -276,6 +277,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
         }
 
         $seen[$property] = true;
+
         return $field;
     }
 
@@ -284,7 +286,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
         $class = static::getEntityFqcn();
         $admin = $this->ez()->getAdmin($class);
 
-        $readOnlyByDefault = (bool)($admin['readOnlyByDefault'] ?? true);
+        $readOnlyByDefault = (bool) ($admin['readOnlyByDefault'] ?? true);
         if (!$readOnlyByDefault) {
             return false;
         }
@@ -317,7 +319,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
     protected function editRoleExpression(): string
     {
         $roles = $this->editRoles();
-        if (count($roles) === 1) {
+        if (1 === count($roles)) {
             return $roles[0];
         }
 
@@ -328,9 +330,10 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
     protected function applyReadOnlyIfNeeded(FieldInterface $field, string $pageName): FieldInterface
     {
-        if ($this->isReadOnly() && ($pageName === Crud::PAGE_NEW || $pageName === Crud::PAGE_EDIT)) {
+        if ($this->isReadOnly() && (Crud::PAGE_NEW === $pageName || Crud::PAGE_EDIT === $pageName)) {
             $field->setFormTypeOption('disabled', true);
         }
+
         return $field;
     }
 
@@ -343,19 +346,20 @@ abstract class AbstractEzCrudController extends AbstractCrudController
         if (!empty($cfg['linkRoute'])) {
             $label = $cfg['label'] ?? null;
             $param = $cfg['linkParam'] ?? 'id';
-            $prop  = $cfg['linkProperty'] ?? null;
+            $prop = $cfg['linkProperty'] ?? null;
 
             $field = LinkedTextField::new($name, $label)
-                ->setRoute((string)$cfg['linkRoute'], (string)$param, $prop ? (string)$prop : null);
+                ->setRoute((string) $cfg['linkRoute'], (string) $param, $prop ? (string) $prop : null);
 
             return $this->applyCommonHints($field, $cfg);
         }
 
         // Explicit field class
         if (!empty($cfg['fieldClass']) && class_exists($cfg['fieldClass'])) {
-            $cls = (string)$cfg['fieldClass'];
+            $cls = (string) $cfg['fieldClass'];
             if (method_exists($cls, 'new')) {
                 $field = $cls::new($name);
+
                 return $this->applyCommonHints($field, $cfg);
             }
         }
@@ -372,11 +376,11 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
         $field = match ($type) {
             'integer', 'bigint', 'smallint' => IntegerField::new($name),
-            'float', 'decimal', 'numeric'   => NumberField::new($name),
-            'boolean'                       => BooleanField::new($name),
+            'float', 'decimal', 'numeric' => NumberField::new($name),
+            'boolean' => BooleanField::new($name),
             'datetime', 'datetimetz', 'date', 'time' => DateTimeField::new($name),
-            'association', 'collection'     => AssociationField::new($name),
-            default                         => TextField::new($name),
+            'association', 'collection' => AssociationField::new($name),
+            default => TextField::new($name),
         };
 
         return $this->applyCommonHints($field, $cfg);
@@ -385,17 +389,18 @@ abstract class AbstractEzCrudController extends AbstractCrudController
     protected function applyCommonHints(FieldInterface $field, array $cfg): FieldInterface
     {
         if (!empty($cfg['label'])) {
-            $field->setLabel((string)$cfg['label']);
+            $field->setLabel((string) $cfg['label']);
         }
         if (!empty($cfg['help'])) {
-            $field->setHelp((string)$cfg['help']);
+            $field->setHelp((string) $cfg['help']);
         }
         if (!empty($cfg['templatePath'])) {
-            $field->setTemplatePath((string)$cfg['templatePath']);
+            $field->setTemplatePath((string) $cfg['templatePath']);
         }
-        if (\array_key_exists('sortable', $cfg) && $cfg['sortable'] !== null) {
-            $field->setSortable((bool)$cfg['sortable']);
+        if (\array_key_exists('sortable', $cfg) && null !== $cfg['sortable']) {
+            $field->setSortable((bool) $cfg['sortable']);
         }
+
         return $field;
     }
 
@@ -411,10 +416,10 @@ abstract class AbstractEzCrudController extends AbstractCrudController
             $showOn = $cfg['showOn'] ?? null;
             $hideOn = $cfg['hideOn'] ?? null;
 
-            if ($hideOn && \in_array($key, (array)$hideOn, true)) {
+            if ($hideOn && \in_array($key, (array) $hideOn, true)) {
                 continue;
             }
-            if ($showOn && !\in_array($key, (array)$showOn, true)) {
+            if ($showOn && !\in_array($key, (array) $showOn, true)) {
                 continue;
             }
 
@@ -422,17 +427,18 @@ abstract class AbstractEzCrudController extends AbstractCrudController
         }
 
         asort($wanted, \SORT_NUMERIC);
+
         return array_keys($wanted);
     }
 
     private function pageToKey(string $eaPage): string
     {
         return match ($eaPage) {
-            Crud::PAGE_INDEX  => Page::INDEX,
+            Crud::PAGE_INDEX => Page::INDEX,
             Crud::PAGE_DETAIL => Page::DETAIL,
-            Crud::PAGE_NEW    => Page::NEW,
-            Crud::PAGE_EDIT   => Page::EDIT,
-            default           => $eaPage,
+            Crud::PAGE_NEW => Page::NEW,
+            Crud::PAGE_EDIT => Page::EDIT,
+            default => $eaPage,
         };
     }
 }

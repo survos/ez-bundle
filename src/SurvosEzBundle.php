@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Survos\EzBundle;
 
-use ReflectionClass;
 use Survos\EzBundle\Attribute\EzAdmin;
 use Survos\EzBundle\Attribute\EzField;
 use Survos\EzBundle\Command\EzCommand;
@@ -53,7 +54,7 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        $entityDir = $container->getParameter('kernel.project_dir') . '/src/Entity';
+        $entityDir = $container->getParameter('kernel.project_dir').'/src/Entity';
 
         $indexedClasses = [];
         $map = [];
@@ -63,14 +64,14 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
                 continue;
             }
 
-            $ref = new ReflectionClass($class);
+            $ref = new \ReflectionClass($class);
 
             // Admin metadata
             $admin = [];
             if ($attrs = $ref->getAttributes(EzAdmin::class)) {
                 /** @var EzAdmin $instance */
                 $instance = $attrs[0]->newInstance();
-                $admin = (array)$instance;
+                $admin = (array) $instance;
                 $indexedClasses[] = $class;
             }
 
@@ -83,7 +84,7 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
                 }
                 /** @var EzField $ef */
                 $ef = $attrs[0]->newInstance();
-                $fields[$prop->getName()] = (array)$ef;
+                $fields[$prop->getName()] = (array) $ef;
             }
 
             if ($admin || $fields) {
@@ -108,18 +109,18 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
         $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
 
         foreach ($rii as $file) {
-            if (!$file->isFile() || $file->getExtension() !== 'php') {
+            if (!$file->isFile() || 'php' !== $file->getExtension()) {
                 continue;
             }
 
-            if (str_ends_with($file->getBasename('.' . $file->getExtension()), 'Interface')) {
+            if (str_ends_with($file->getBasename('.'.$file->getExtension()), 'Interface')) {
                 continue;
             }
 
             $contents = file_get_contents($file->getRealPath());
             if (preg_match('/namespace\s+([^;]+);/i', $contents, $nsMatch)
                 && preg_match('/^class\s+([A-Za-z_][A-Za-z0-9_]*)/m', $contents, $classMatch)) {
-                $classes[] = $nsMatch[1] . '\\' . $classMatch[1];
+                $classes[] = $nsMatch[1].'\\'.$classMatch[1];
             }
         }
 
@@ -130,7 +131,7 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
     {
         $builder->prependExtensionConfig('twig', [
             'paths' => [
-                dirname(__DIR__) . '/templates' => 'SurvosEz',
+                dirname(__DIR__).'/templates' => 'SurvosEz',
             ],
         ]);
     }

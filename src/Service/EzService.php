@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Survos\EzBundle\Service;
@@ -14,7 +15,7 @@ namespace Survos\EzBundle\Service;
  *        ...
  *     ],
  *   ],
- * ]
+ * ].
  */
 final class EzService
 {
@@ -51,6 +52,7 @@ final class EzService
 
     /**
      * Handy helper for INDEX page: returns ordered, truncated field names.
+     *
      * @return string[]
      */
     public function getIndexFieldNames(string $class, int $fallbackMax = 7): array
@@ -58,7 +60,7 @@ final class EzService
         $fields = $this->getFields($class);
         $indexMax = $this->getAdmin($class)['indexMax'] ?? $fallbackMax;
 
-        $filtered = array_filter($fields, static fn(array $f) => ($f['index'] ?? false) === true);
+        $filtered = array_filter($fields, static fn (array $f) => ($f['index'] ?? false) === true);
 
         uasort($filtered, static function (array $a, array $b): int {
             return ($a['order'] ?? 1000) <=> ($b['order'] ?? 1000);

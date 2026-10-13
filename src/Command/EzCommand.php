@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Survos\EzBundle\Command;
 
 use Survos\EzBundle\Service\EzService;
@@ -16,14 +18,13 @@ class EzCommand
     }
 
     public function __invoke(
-		SymfonyStyle $io,
-		#[Option('Reset data before processing')]
-		?bool $reset = null,
-	): int
-	{
+        SymfonyStyle $io,
+        #[Option('Reset data before processing')]
+        ?bool $reset = null,
+    ): int {
         dd($this->ezService->all());
-		$io->success('Command executed successfully!');
+        $io->success('Command executed successfully!');
 
-		return Command::SUCCESS;
-	}
+        return Command::SUCCESS;
+    }
 }

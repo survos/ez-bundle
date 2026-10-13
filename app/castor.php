@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 use Castor\Attribute\AsTask;
 
-use function Castor\{io, run, fs, variable, finder, http_request, import};
+use function Castor\finder;
+use function Castor\fs;
+use function Castor\http_request;
+use function Castor\io;
+use function Castor\run;
+use function Castor\variable;
 
 function getBundleName(): string
 {
@@ -12,6 +19,7 @@ function getBundleName(): string
 function getSkeletonPath(): string
 {
     $bundleName = getBundleName();
+
     return sprintf('vendor/%s/app', $bundleName);
 }
 
@@ -43,10 +51,10 @@ function easyadmin(): void
     io()->title('configure easyadmin');
     $root = 'src/Controller/Admin';
     fs()->mkdir($root, 0755);
-    $skeletonPath = __DIR__ . '/' . getSkeletonPath() . '/src/Controller/Admin';
+    $skeletonPath = __DIR__.'/'.getSkeletonPath().'/src/Controller/Admin';
 
     foreach (finder()->in($skeletonPath)->files() as $file) {
-        fs()->copy($file->getRealPath(), $targetFile = 'src/Controller/Admin/' . $file->getBasename());
+        fs()->copy($file->getRealPath(), $targetFile = 'src/Controller/Admin/'.$file->getBasename());
         io()->write(file_get_contents($targetFile));
     }
     run('bin/console cache:clear');
@@ -59,7 +67,7 @@ function database(): void
 
     if (!fs()->exists('.env.local')) {
         $dbUrl = 'DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"';
-        fs()->appendToFile('.env.local', $dbUrl . PHP_EOL);
+        fs()->appendToFile('.env.local', $dbUrl.PHP_EOL);
         io()->success('Created .env.local with SQLite configuration');
     } else {
         io()->note('.env.local already exists');
@@ -77,6 +85,7 @@ function copy_files(): void
     if (!fs()->exists($base)) {
         io()->error("Skeleton path not found: {$base}");
         io()->note('Make sure the bundle is installed via composer');
+
         return;
     }
 
@@ -91,7 +100,7 @@ function copy_files(): void
     io()->title('Copying skeleton files');
 
     foreach ($files as $file) {
-        $source = $base . '/' . $file;
+        $source = $base.'/'.$file;
         $target = $file;
 
         if (!fs()->exists($source)) {
@@ -122,10 +131,9 @@ function load_data(): void
 
 #[AsTask('open', description: 'Start web server and open in browser')]
 function open(
-    #[\Castor\Attribute\AsArgument] string $path='/'
-): void
-{
-    run('symfony open:local --path=' . $path); // Adjust path as needed
+    #[Castor\Attribute\AsArgument] string $path = '/',
+): void {
+    run('symfony open:local --path='.$path); // Adjust path as needed
 }
 
 #[AsTask('build', description: 'Complete demo setup (all steps)')]
@@ -173,15 +181,15 @@ function clean(): void
 function ngrok(
     string $subdomain = '',
     string $region = '',
-    bool $inspect = true
-): void
-{
+    bool $inspect = true,
+): void {
     io()->title('Starting ngrok tunnel');
 
     $port = get_symfony_port_from_proxy();
 
     if (!$port) {
         io()->error('Could not detect Symfony server port');
+
         return;
     }
 
@@ -198,7 +206,7 @@ function ngrok(
     }
 
     if (!$inspect) {
-        $command .= " --inspect=false";
+        $command .= ' --inspect=false';
     }
 
     io()->note('Starting ngrok tunnel...');
@@ -211,7 +219,7 @@ function ngrok(
 function get_symfony_port_from_proxy(): ?int
 {
     // Remove the $ anchor
-    $status = \Castor\capture("symfony server:status");
+    $status = \Castor\capture('symfony server:status');
     if (preg_match('|127\.0\.0\.1:(\d+)|', $status, $matches)) {
         return (int) $matches[1];
     }
@@ -219,19 +227,20 @@ function get_symfony_port_from_proxy(): ?int
     $currentDir = getcwd();
     if (preg_match($regex = '|127\.0\.0\.1\:(\d+)$|sm', $status, $matches)) {
         dd($matches);
+
         return $matches[1];
-    } else {
-        dd(badRexex: $regex, status: $status);
     }
+    dd(badRexex: $regex, status: $status);
+
     dd($status);
 
     // Fetch the proxy status page
     $response = http_request('GET', 'http://127.0.0.1:7080', [
-//        'content-type' => 'application/json',
+        //        'content-type' => 'application/json',
     ]);
     dd($response->getContent());
 
-    if ($content === false) {
+    if (false === $content) {
         return null;
     }
 
@@ -240,7 +249,7 @@ function get_symfony_port_from_proxy(): ?int
 
     foreach ($lines as $line) {
         // Look for line containing current directory and a port
-        if (strpos($line, $currentDir) !== false) {
+        if (false !== strpos($line, $currentDir)) {
             if (preg_match('/127\.0\.0\.1:(\d+)/', $line, $matches)) {
                 return (int) $matches[1];
             }

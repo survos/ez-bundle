@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
@@ -13,8 +15,9 @@ use Survos\EzBundle\Attribute\EzField;
 class Product
 {
     public function __construct(
-        #[ORM\Id] #[ORM\Column] private(set) ?string $sku = null
-    ) { }
+        #[ORM\Id] #[ORM\Column] public private(set) ?string $sku = null,
+    ) {
+    }
 
     #[ORM\Column(length: 255)]
     #[EzField(type: Types::TEXT)]
@@ -32,5 +35,4 @@ class Product
 
     #[ORM\Column(nullable: true)]
     public ?int $stock = null;
-
 }
