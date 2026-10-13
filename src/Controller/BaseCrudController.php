@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -164,13 +165,17 @@ abstract class BaseCrudController extends AbstractCrudController
         $class   = static::getEntityFqcn();
         $fieldsC = $this->ez->getFields($class);
 
+        $entity = $this->getContext()?->getEntity();
         if (!$fieldsC) {
-            // No EzField attributes → fallback to EA's default resolution (parent)
-            yield from parent::configureFields($pageName);
+            // No EzField attributes → EA's default resolution, except that EA guesses enum-typed
+            // columns as text (they are 'string' to Doctrine) and then cannot render the enum.
+            foreach (parent::configureFields($pageName) as $field) {
+                $property = $field->getAsDto()->getProperty();
+                yield $this->enumType($entity, $property) ? ChoiceField::new($property) : $field;
+            }
             return;
         }
 
-        $entity = $this->getContext()?->getEntity();
         $indexNames = $pageName === Crud::PAGE_INDEX
             ? $this->ez->getIndexFieldNames($class, 7)
             : $this->orderedNamesForPage($fieldsC, $pageName);
@@ -261,6 +266,10 @@ abstract class BaseCrudController extends AbstractCrudController
             }
         }
 
+        if ($this->enumType($entity, $name)) {
+            return ChoiceField::new($name); // EA fills the choices from the column's enumType
+        }
+
         // Otherwise pick a sensible default from Doctrine type
         $type = $this->getDoctrineType($entity, $name);
 
@@ -292,6 +301,17 @@ abstract class BaseCrudController extends AbstractCrudController
         }
 
         return null;
+    }
+
+    /** The BackedEnum class Doctrine maps $property to, if any. */
+    private function enumType(?EntityDto $entity, string $property): ?string
+    {
+        $metadata = $entity?->getClassMetadata();
+        if (!$metadata?->hasField($property)) {
+            return null;
+        }
+
+        return $metadata->getFieldMapping($property)->enumType ?? null;
     }
 
     private function isAssociation(?EntityDto $entity, string $property): bool
