@@ -4,6 +4,7 @@ Lightweight tools that extend EasyAdmin (easycorp/easyadmin-bundle).
 
 ## Features
 
+- Event-driven menu slots across desktop/mobile headers, page navigation, actions, sidebar and footer
 - Define default fields via attributes
 - Generate all entity crud controllers via a single command (code-bundle?)
 - Automatic configuration of filters
@@ -16,6 +17,13 @@ Install the bundle using Composer:
 ```bash
 composer require survos/ez-bundle
 ```
+
+## Menu integration
+
+Requires PHP 8.5, Symfony 8.1+, EasyAdmin 5.9+, Twig 3.29+ and survos/menu-bundle.
+The bundle registers its slot layout by default. See [menu integration](docs/menus.md)
+for listeners, page context, locale placement and replacing the listing action.
+KnpMenuBundle still provides the library factory and matcher; it is not removed by this integration.
 
 ## Usage
 
@@ -33,7 +41,7 @@ class ForteObj
     #[EzField(index: true, order: 2)]
     public ?string $title = null;
 }
-````
+```
 
 ## Testing
 

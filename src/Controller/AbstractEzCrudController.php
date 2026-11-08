@@ -46,6 +46,14 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 abstract class AbstractEzCrudController extends AbstractCrudController
 {
+    #[Required]
+    public function setContextNavigation(\Survos\EzBundle\Menu\ContextNavigation $navigation): void
+    {
+        $this->contextNavigation = $navigation;
+    }
+
+    private \Survos\EzBundle\Menu\ContextNavigation $contextNavigation;
+
     private EzService $ez;
     private Security $security;
     private ManagerRegistry $doctrine;
@@ -107,7 +115,7 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $actions = parent::configureActions($actions);
+        $actions = $this->contextNavigation->configure(parent::configureActions($actions));
 
         // this is on by default
         //        $actions

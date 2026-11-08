@@ -6,34 +6,42 @@ namespace Survos\EzBundle;
 
 use Survos\EzBundle\Attribute\EzAdmin;
 use Survos\EzBundle\Attribute\EzField;
-use Survos\EzBundle\Command\EzCommand;
-use Survos\EzBundle\Command\MakeAdminCommand;
+use Survos\EzBundle\Menu\ContextNavigation;
+use Survos\EzBundle\Menu\EasyAdminMenus;
+use Survos\EzBundle\Menu\LocaleMenuListener;
+use Survos\EzBundle\Menu\MenuContextListener;
 use Survos\EzBundle\Service\EzService;
+use Survos\EzBundle\Twig\EzMenuExtension;
+use Survos\Kit\AbstractUxBundle;
+use Survos\Kit\SurvosKitBundle;
+use Survos\MenuBundle\SurvosMenuBundle;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Symfony\Component\Finder\Finder;
 
-class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
+#[RequiredBundle(SurvosKitBundle::class)]
+#[RequiredBundle(SurvosMenuBundle::class)]
+// Symfony\Component\HttpKernel\Bundle\Bundle <-- Flex auto-registration marker (see Survos\Kit\AbstractSurvosBundle)
+final class SurvosEzBundle extends AbstractUxBundle
 {
     protected string $extensionAlias = 'survos_ez';
 
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
+        parent::loadExtension($config, $container, $builder);
+
         $builder->autowire(EzService::class)
             ->setArgument('$config', $config)
             ->setAutowired(true)
             ->setPublic(true)
             ->setAutoconfigured(true);
 
-        foreach ([MakeAdminCommand::class, EzCommand::class] as $class) {
-            $builder->autowire($class)
-                ->setPublic(true)
-                ->setAutoconfigured(true)
-                ->addTag('console.command');
+        foreach ([EasyAdminMenus::class, ContextNavigation::class, LocaleMenuListener::class, MenuContextListener::class, EzMenuExtension::class] as $class) {
+            $builder->autowire($class)->setAutoconfigured(true);
         }
+        $builder->getDefinition(EasyAdminMenus::class)->setArgument('$localePlacement', $config['localePlacement']);
     }
 
     public function configure(DefinitionConfigurator $definition): void
@@ -42,14 +50,8 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
 
         $rootNode
             ->children()
-                ->booleanNode('enabled')->defaultTrue()->end()
+                ->enumNode('localePlacement')->values(['header', 'settings'])->defaultValue('header')->end()
             ->end();
-    }
-
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-        $container->addCompilerPass($this, PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 
     public function process(ContainerBuilder $container): void
@@ -106,21 +108,14 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
     private function getClassesInDirectory(string $dir): array
     {
         $classes = [];
-        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
-
-        foreach ($rii as $file) {
-            if (!$file->isFile() || 'php' !== $file->getExtension()) {
-                continue;
-            }
-
-            if (str_ends_with($file->getBasename('.'.$file->getExtension()), 'Interface')) {
-                continue;
-            }
-
-            $contents = file_get_contents($file->getRealPath());
-            if (preg_match('/namespace\s+([^;]+);/i', $contents, $nsMatch)
-                && preg_match('/^class\s+([A-Za-z_][A-Za-z0-9_]*)/m', $contents, $classMatch)) {
-                $classes[] = $nsMatch[1].'\\'.$classMatch[1];
+        if (!is_dir($dir)) {
+            return $classes;
+        }
+        foreach ((new Finder())->files()->in($dir)->name('*.php') as $file) {
+            $relative = substr($file->getRelativePathname(), 0, -4);
+            $class = 'App\\Entity\\'.str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
+            if (class_exists($class)) {
+                $classes[] = $class;
             }
         }
 
@@ -129,10 +124,9 @@ class SurvosEzBundle extends AbstractBundle implements CompilerPassInterface
 
     public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
     {
+        parent::prependExtension($container, $builder);
         $builder->prependExtensionConfig('twig', [
-            'paths' => [
-                dirname(__DIR__).'/templates' => 'SurvosEz',
-            ],
+            'paths' => [dirname(__DIR__).'/templates/easyadmin' => 'EasyAdmin'],
         ]);
     }
 }

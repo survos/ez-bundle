@@ -6,7 +6,7 @@ namespace Survos\EzBundle\Tests;
 
 use Survos\EzBundle\SurvosEzBundle;
 
-class SurvosEzBundleTest extends \TestCase
+class SurvosEzBundleTest extends \PHPUnit\Framework\TestCase
 {
     public function testBundleExists(): void
     {

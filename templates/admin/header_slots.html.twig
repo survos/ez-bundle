@@ -1,0 +1,8 @@
+{% set headerMenus %}
+    {{ ez_menu(NAVBAR_START) }}
+    {{ ez_menu(NAVBAR_LANGUAGE) }}
+    {{ ez_menu(NAVBAR_END) }}
+{% endset %}
+{% if headerMenus|trim is not empty %}
+    <div class="ez-header-slots">{{ headerMenus }}</div>
+{% endif %}

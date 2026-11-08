@@ -1,0 +1,45 @@
+{% block menu %}
+<nav{{ menu_attrs(menu.attributes, {class: 'ez-menu' ~ (options.vertical|default(false) ? ' ez-menu-vertical' : ''), 'data-ez-slot': options.slot}) }}>
+    {% for item in menu.children %}{{ block('item') }}{% endfor %}
+</nav>
+{% endblock %}
+{% block item %}{{ block('item_' ~ item.kind.value) }}{% endblock %}
+{% block item_link %}
+{% set badgeContent = block('badge') %}
+<span{{ menu_attrs(item.attributes) }}>
+    <twig:ea:Button htmlElement="a" role="link" href="{{ item.uri }}" variant="ghost" icon="{{ item.icon }}" {{ ...item.linkAttributes }} aria-current="{{ item.current ? 'page' : 'false' }}">{{ item.label }}{{ badgeContent }}</twig:ea:Button>
+</span>
+{% endblock %}
+{% block item_submenu %}
+{% set badgeContent = block('badge') %}
+{% set entries %}{% for item in item.children %}{{ block('submenu_item') }}{% endfor %}{% endset %}
+<twig:ea:ActionMenu {{ ...item.attributes }}>
+    <twig:ea:ActionMenu:Button {{ ...item.linkAttributes }}>
+        {% if item.icon %}<twig:ea:Icon name="{{ item.icon }}" />{% endif %}
+        {{ item.label }}{{ badgeContent }}
+    </twig:ea:ActionMenu:Button>
+    <twig:ea:ActionMenu:Overlay>
+        <twig:ea:ActionMenu:ActionList align="end">
+            {{ entries }}
+        </twig:ea:ActionMenu:ActionList>
+    </twig:ea:ActionMenu:Overlay>
+</twig:ea:ActionMenu>
+{% endblock %}
+{% block submenu_item %}
+    {% if item.kind.value == 'divider' %}
+        <twig:ea:ActionMenu:ActionList:Divider />
+    {% elseif item.kind.value == 'heading' or item.kind.value == 'submenu' %}
+        <li{{ menu_attrs(item.attributes, {class: 'dropdown-header'}) }}>{{ item.label }}</li>
+        {% for item in item.children %}{{ block('submenu_item') }}{% endfor %}
+    {% elseif item.kind.value == 'search' %}
+        <li{{ menu_attrs(item.attributes) }}>{{ block('search_form') }}</li>
+    {% else %}
+        <li{{ menu_attrs(item.attributes) }}>
+            <twig:ea:ActionMenu:ActionList:Item url="{{ item.uri }}" label="{{ item.label }}" icon="{{ item.icon }}" :selected="item.current" :wrapInListItem="false" :htmlAttributes="item.linkAttributes" />
+        </li>
+    {% endif %}
+{% endblock %}
+{% block item_heading %}<span{{ menu_attrs(item.attributes) }}>{{ item.label }}</span>{% endblock %}
+{% block item_divider %}<span role="separator"></span>{% endblock %}
+{% block item_search %}<div{{ menu_attrs(item.attributes) }}>{{ block('search_form') }}</div>{% endblock %}
+{% block badge %}{% if item.badge %}<span class="badge">{{ item.badge.value }}</span>{% endif %}{% endblock %}

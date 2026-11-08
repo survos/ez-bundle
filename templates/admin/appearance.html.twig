@@ -1,0 +1,16 @@
+{% if ea.dashboardHasDarkModeEnabled %}
+<twig:ea:ActionMenu class="dropdown-settings">
+    <twig:ea:ActionMenu:Button class="dropdown-settings-button" aria-label="{{ 'settings.appearance.label'|trans(domain: 'EasyAdminBundle') }}" withoutDropdownToggleMarker>
+        <twig:ea:Icon name="internal:gear" />
+    </twig:ea:ActionMenu:Button>
+    <twig:ea:ActionMenu:Overlay>
+        <twig:ea:ActionMenu:ActionList align="end">
+            <twig:ea:ActionMenu:ActionList:RadioList label="{{ 'settings.appearance.label'|trans(domain: 'EasyAdminBundle') }}">
+                {% for scheme, icon in {light: 'sun', dark: 'moon', auto: 'desktop'} %}
+                    <twig:ea:ActionMenu:ActionList:Item class="dropdown-appearance-item" url="#" icon="{{ 'internal:' ~ icon }}" data-ea-color-scheme="{{ scheme }}" :selected="scheme == 'auto'" label="{{ ('settings.appearance.' ~ scheme)|trans(domain: 'EasyAdminBundle') }}" />
+                {% endfor %}
+            </twig:ea:ActionMenu:ActionList:RadioList>
+        </twig:ea:ActionMenu:ActionList>
+    </twig:ea:ActionMenu:Overlay>
+</twig:ea:ActionMenu>
+{% endif %}

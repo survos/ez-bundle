@@ -19,8 +19,11 @@
         "symfony/dependency-injection": "^7.4||^8.1",
         "symfony/http-kernel": "^7.4||^8.1",
         "symfony/console": "^7.4||^8.1",
-        "easycorp/easyadmin-bundle": "^4.25|^5.0",
-        "symfony/framework-bundle": "^7.4||^8.1"
+        "easycorp/easyadmin-bundle": "^5.9",
+        "symfony/framework-bundle": "^7.4||^8.1",
+        "survos/kit-bundle": "^2.5",
+        "survos/menu-bundle": "^2.5",
+        "symfony/finder": "^8.1"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^7.4||^8.1",

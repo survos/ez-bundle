@@ -37,6 +37,14 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 abstract class BaseCrudController extends AbstractCrudController
 {
+    #[Required]
+    public function setContextNavigation(\Survos\EzBundle\Menu\ContextNavigation $navigation): void
+    {
+        $this->contextNavigation = $navigation;
+    }
+
+    private \Survos\EzBundle\Menu\ContextNavigation $contextNavigation;
+
     private array $seen;
 
     // although empty, phpstan complains about not calling the parent constructor. maybe set $seen?
@@ -60,7 +68,7 @@ abstract class BaseCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         // Reasonable defaults; tweak in child classes if needed
-        return parent::configureActions($actions)
+        return $this->contextNavigation->configure(parent::configureActions($actions))
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->setPermission(Action::NEW, 'ROLE_ADMIN')
             ->setPermission(Action::EDIT, 'ROLE_ADMIN')
