@@ -18,6 +18,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+use Survos\EzBundle\Translation\FieldLabel;
+use Survos\FieldBundle\Model\FieldDescriptor;
 use Survos\FieldBundle\Service\FieldReader;
 use Symfony\Component\Form\Attribute\FormField;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -40,10 +42,23 @@ final class CrudFieldReader
     /** @return iterable<FieldInterface> */
     public function fields(string $class, string $page): iterable
     {
+        $descriptors = [];
+        foreach ($this->fields->getDescriptors($class) as $descriptor) {
+            $descriptors[$descriptor->name] = $descriptor;
+        }
         if (in_array($page, [Crud::PAGE_NEW, Crud::PAGE_EDIT], true)) {
             foreach ($this->formProperties($class) as $property => $attribute) {
                 $name = $attribute->name ?? $property;
                 $options = $attribute->options;
+                $descriptor = $descriptors[$property] ?? new FieldDescriptor($property);
+                if (!array_key_exists('translation_domain', $options)) {
+                    $options['translation_domain'] = $descriptor->getTranslationDomain();
+                }
+                if (!array_key_exists('label', $options) && !isset($options['label_format'])) {
+                    $options['label'] = false === $options['translation_domain']
+                        ? $descriptor->getFallbackLabel()
+                        : new FieldLabel($descriptor->getTranslationKey(), $descriptor->getFallbackLabel(), $options['translation_domain'] ?? $descriptor->getTranslationDomain());
+                }
                 if ($name !== $property) {
                     $options['property_path'] ??= $property;
                 }
@@ -56,6 +71,7 @@ final class CrudFieldReader
                     unset($resolvedOptions['data']);
                 }
                 yield \Survos\EzBundle\Field\NativeFormField::new($name)
+                    ->setLabel($options['label'] ?? null)
                     ->setFormType($builder->getType()->getInnerType()::class)
                     ->setFormTypeOptions($resolvedOptions);
             }
@@ -83,9 +99,7 @@ final class CrudFieldReader
                 default => TextField::new($name),
             };
             $field->setSortable($descriptor->sortable && ($metadata?->hasField($name) ?? false));
-            if (null !== $descriptor->transKey) {
-                $field->setLabel(new \Symfony\Component\Translation\TranslatableMessage($descriptor->transKey, [], $descriptor->getTranslationDomain()));
-            }
+            $field->setLabel(new FieldLabel($descriptor->getTranslationKey(), $descriptor->getFallbackLabel(), $descriptor->getTranslationDomain()));
             yield $field;
         }
     }

@@ -2,6 +2,10 @@
     {{ ez_menu(NAVBAR_START) }}
     {{ ez_menu(NAVBAR_LANGUAGE) }}
     {{ ez_menu(NAVBAR_END) }}
+    {% if (tabler_admin_toolbar ?? true) and (is_granted('ROLE_ADMIN') or app.debug) %}
+        {{ ez_menu(ADMIN_NAVBAR_MENU) }}
+        {{ ez_menu(ADMIN_NAVBAR_MENU_END) }}
+    {% endif %}
 {% endset %}
 {% if headerMenus|trim is not empty %}
     <div class="ez-header-slots">{{ headerMenus }}</div>

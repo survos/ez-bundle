@@ -92,3 +92,32 @@ Run the test suite:
 ## License
 
 This bundle is released under the MIT license. See the [LICENSE](LICENSE) file for details.
+
+### Field label translations
+
+FieldReader-backed columns use the property name as a translation key in the
+Symfony `fields` domain. Supply `translations/fields.en.yaml`,
+`fields.es.yaml`, or equivalent XLIFF catalogues. For example:
+
+```yaml
+# translations/fields.es.yaml
+price: Precio
+stock: Existencias
+```
+
+`#[Field(transKey: 'product.price')]` overrides the key. Labels resolve in the
+rendering locale, including Symfony locale fallbacks; missing keys use the
+descriptor's readable fallback. EasyAdmin inherits these labels for filters.
+Native `#[FormField]` fields use the same key/domain by default (aliases retain
+the original property's key). Explicit form `label`, `label_format`, and
+`translation_domain` options take precedence, including `label: false` and
+`translation_domain: false`. Thin-controller field overrides remain authoritative.
+
+These catalogues translate UI labels, independently of Babel-translated entity
+values. Lingua users can harvest the English catalogue with
+`lingua:harvest:messages --domains=fields`; dynamically derived field keys must
+be present in that catalogue because Twig extraction cannot discover them.
+
+The header also renders `ADMIN_NAVBAR_MENU` and `ADMIN_NAVBAR_MENU_END` using
+the same listeners as Tabler. Like Tabler, these slots are visible to
+`ROLE_ADMIN` users or in debug mode, and honor `tabler_admin_toolbar: false`.

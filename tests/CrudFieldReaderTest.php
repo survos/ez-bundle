@@ -77,6 +77,27 @@ final class CrudFieldReaderTest extends TestCase
         self::assertSame([], iterator_to_array($reader->fields(HiddenFixture::class, Crud::PAGE_EDIT)));
     }
 
+    public function testLabelsTranslateAtRenderTimeAndRespectFormOverrides(): void
+    {
+        $translator = new \Symfony\Component\Translation\Translator('es');
+        $translator->addLoader('array', new \Symfony\Component\Translation\Loader\ArrayLoader());
+        $translator->addResource('array', ['label' => 'Etiqueta', 'count' => 'Cantidad', 'product.price' => 'Precio'], 'es', 'fields');
+        $translator->addResource('array', ['count' => 'Count'], 'en', 'fields');
+        $reader = $this->reader();
+        $fields = iterator_to_array($reader->fields(ReaderFixture::class, Crud::PAGE_INDEX));
+        self::assertSame('Cantidad', $fields[0]->getAsDto()->getLabel()->trans($translator));
+        self::assertSame('Count', $fields[0]->getAsDto()->getLabel()->trans($translator, 'en'));
+        $forms = iterator_to_array($reader->fields(ReaderFixture::class, Crud::PAGE_EDIT));
+        self::assertSame('Etiqueta', $forms[0]->getAsDto()->getFormTypeOptions()['label']->trans($translator));
+        self::assertSame('fields', $forms[0]->getAsDto()->getFormTypeOptions()['translation_domain']);
+        self::assertSame('When', $forms[2]->getAsDto()->getLabel()->trans($translator));
+        $forms = iterator_to_array($reader->fields(LabelFixture::class, Crud::PAGE_EDIT));
+        self::assertSame('Precio', $forms[0]->getAsDto()->getLabel()->trans($translator));
+        self::assertFalse($forms[1]->getAsDto()->getFormTypeOptions()['label']);
+        self::assertSame('custom', $forms[2]->getAsDto()->getFormTypeOptions()['label']);
+        self::assertSame('other', $forms[2]->getAsDto()->getFormTypeOptions()['translation_domain']);
+    }
+
     public function testThinControllerOverridesWin(): void
     {
         $controller = new class extends AbstractEzCrudController {
@@ -125,4 +146,17 @@ final class HiddenFixture
 {
     #[Field(visible: false)]
     public array $embedding = [];
+}
+
+final class LabelFixture
+{
+    #[Field(transKey: 'product.price')]
+    #[FormField]
+    public float $price = 1;
+
+    #[FormField(options: ['label' => false])]
+    public string $hiddenLabel = '';
+
+    #[FormField(options: ['label' => 'custom', 'translation_domain' => 'other'])]
+    public string $customLabel = '';
 }
