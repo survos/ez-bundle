@@ -23,7 +23,9 @@
         "symfony/framework-bundle": "^7.4||^8.1",
         "survos/kit-bundle": "^2.5",
         "survos/menu-bundle": "^2.5",
-        "symfony/finder": "^8.1"
+        "symfony/finder": "^8.1",
+        "survos/field-bundle": "^2.45.36",
+        "symfony/form": "^8.2"
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^7.4||^8.1",

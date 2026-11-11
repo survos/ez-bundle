@@ -32,11 +32,19 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * Extend this in your app CRUDs.
  *
- * By default, fields & filters are derived from #[EzAdmin] and #[EzField] attributes,
- * falling back gracefully to EasyAdmin defaults if no attributes are present.
+ * FieldReader describes display fields and Symfony FormField selects form inputs.
+ * Models without modern metadata retain the legacy EzField / EasyAdmin defaults.
  */
 abstract class BaseCrudController extends AbstractCrudController
 {
+    private \Survos\EzBundle\Service\CrudFieldReader $crudFields;
+
+    #[Required]
+    public function setCrudFieldReader(\Survos\EzBundle\Service\CrudFieldReader $crudFields): void
+    {
+        $this->crudFields = $crudFields;
+    }
+
     #[Required]
     public function setContextNavigation(\Survos\EzBundle\Menu\ContextNavigation $navigation): void
     {
@@ -109,6 +117,14 @@ abstract class BaseCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
+        if ($this->crudFields->supports(static::getEntityFqcn())) {
+            foreach ($this->crudFields->filterProperties(static::getEntityFqcn()) as $property) {
+                $filters->add($property);
+            }
+
+            return $filters;
+        }
+
         $class = static::getEntityFqcn();
         $map = $this->ez->getFields($class);
         $entity = $this->getContext()?->getEntity();
@@ -167,6 +183,12 @@ abstract class BaseCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        if ($this->crudFields->supports(static::getEntityFqcn())) {
+            yield from $this->crudFields->fields(static::getEntityFqcn(), $pageName);
+
+            return;
+        }
+
         $class = static::getEntityFqcn();
         $fieldsC = $this->ez->getFields($class);
 

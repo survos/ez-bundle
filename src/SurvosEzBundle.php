@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Finder\Finder;
 
+#[RequiredBundle(\Survos\FieldBundle\SurvosFieldBundle::class)]
 #[RequiredBundle(SurvosKitBundle::class)]
 #[RequiredBundle(SurvosMenuBundle::class)]
 // Symfony\Component\HttpKernel\Bundle\Bundle <-- Flex auto-registration marker (see Survos\Kit\AbstractSurvosBundle)
@@ -38,7 +39,7 @@ final class SurvosEzBundle extends AbstractUxBundle
             ->setPublic(true)
             ->setAutoconfigured(true);
 
-        foreach ([EasyAdminMenus::class, ContextNavigation::class, LocaleMenuListener::class, MenuContextListener::class, EzMenuExtension::class] as $class) {
+        foreach ([Service\CrudFieldReader::class, EasyAdminMenus::class, ContextNavigation::class, LocaleMenuListener::class, MenuContextListener::class, EzMenuExtension::class] as $class) {
             $builder->autowire($class)->setAutoconfigured(true);
         }
         $builder->getDefinition(EasyAdminMenus::class)->setArgument('$localePlacement', $config['localePlacement']);

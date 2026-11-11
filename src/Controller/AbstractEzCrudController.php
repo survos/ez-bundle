@@ -37,8 +37,8 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * Precedence for fields:
  *   1) preferredFields() from the CRUD controller
- *   2) EzField-driven fields
- *   3) EasyAdmin parent defaults (fill)
+ *   2) FieldReader display fields / native FormField inputs
+ *   3) Legacy EzField and EasyAdmin defaults only for models without modern metadata
  *
  * Default security/UX:
  *   - Read-only (hide NEW/EDIT/DELETE) unless user has ROLE_ADMIN or ROLE_EDITOR,
@@ -46,6 +46,14 @@ use Symfony\Contracts\Service\Attribute\Required;
  */
 abstract class AbstractEzCrudController extends AbstractCrudController
 {
+    private \Survos\EzBundle\Service\CrudFieldReader $crudFields;
+
+    #[Required]
+    public function setCrudFieldReader(\Survos\EzBundle\Service\CrudFieldReader $crudFields): void
+    {
+        $this->crudFields = $crudFields;
+    }
+
     #[Required]
     public function setContextNavigation(\Survos\EzBundle\Menu\ContextNavigation $navigation): void
     {
@@ -160,6 +168,14 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
+        if ($this->crudFields->supports(static::getEntityFqcn())) {
+            foreach ($this->crudFields->filterProperties(static::getEntityFqcn()) as $property) {
+                $filters->add($property);
+            }
+
+            return $filters;
+        }
+
         $class = static::getEntityFqcn();
         $map = $this->ez()->getFields($class);
 
@@ -226,6 +242,17 @@ abstract class AbstractEzCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        if ($this->crudFields->supports(static::getEntityFqcn())) {
+            $seen = [];
+            foreach ([...$this->preferredFields($pageName), ...$this->crudFields->fields(static::getEntityFqcn(), $pageName)] as $field) {
+                if ($field = $this->once($seen, $field)) {
+                    yield $this->applyReadOnlyIfNeeded($field, $pageName);
+                }
+            }
+
+            return;
+        }
+
         $class = static::getEntityFqcn();
         $fieldsC = $this->ez()->getFields($class);
         $admin = $this->ez()->getAdmin($class);
